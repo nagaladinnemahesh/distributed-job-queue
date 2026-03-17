@@ -32,6 +32,7 @@ export async function jobRoutes(fastify: FastifyInstance) {
       createdAt: job.createdAt,
       completedAt: job.completedAt,
       failedAt: job.failedAt,
+      errorMessage: job.errorMessage ?? null,
     };
   });
 }

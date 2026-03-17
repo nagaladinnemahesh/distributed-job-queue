@@ -17,4 +17,5 @@ model Job {
   updatedAt   DateTime  @updatedAt
   completedAt DateTime?
   failedAt    DateTime?
+  errorMessage String?
 }

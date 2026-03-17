@@ -1,0 +1,44 @@
+### Submit a basic email job
+POST http://localhost:3000/jobs
+Content-Type: application/json
+
+{
+  "type": "send_email",
+  "payload": {
+    "email": "test@example.com"
+  }
+}
+
+### Submit a job that will likely fail (to test retry + DLQ)
+POST http://localhost:3000/jobs
+Content-Type: application/json
+
+{
+  "type": "send_email",
+  "payload": {
+    "email": "fail@example.com"
+  }
+}
+
+### Submit an unknown job type (will always fail + go DEAD)
+POST http://localhost:3000/jobs
+Content-Type: application/json
+
+{
+  "type": "generate_report",
+  "payload": {
+    "reportId": "q4-2026"
+  }
+}
+
+### Get job status — replace the ID with a real one
+GET http://localhost:3000/jobs/REPLACE_WITH_JOB_ID
+
+### Get a completed job
+GET http://localhost:3000/jobs/3fe15724-e0db-4207-93f1-2b3f8de7a70d
+
+### Get a dead/failed job — should show errorMessage
+GET http://localhost:3000/jobs/7605349b-f846-4222-a041-a83f7550d533
+
+### Health check
+GET http://localhost:3000
