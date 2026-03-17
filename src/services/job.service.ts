@@ -10,3 +10,9 @@ export async function createJob(type: string, payload: any) {
 
   return job;
 }
+
+export async function getJobById(id: string) {
+  return prisma.job.findUnique({
+    where: { id },
+  });
+}
