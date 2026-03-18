@@ -5,12 +5,20 @@ import { request } from "node:http";
 export async function jobRoutes(fastify: FastifyInstance) {
   fastify.post("/jobs", async (request, reply) => {
     const { type, payload } = request.body as any;
-    const job = await createJob(type, payload);
 
-    return {
-      jobId: job.id,
-      status: job.status,
-    };
+    if (!type) {
+      return reply.status(400).send({ error: "type is required" });
+    }
+
+    try {
+      const job = await createJob(type, payload);
+      return reply.status(201).send({
+        jobId: job.id,
+        status: job.status,
+      });
+    } catch (error: any) {
+      return reply.status(400).send({ error: error.message });
+    }
   });
 
   fastify.get("/jobs/:id", async (request, reply) => {
