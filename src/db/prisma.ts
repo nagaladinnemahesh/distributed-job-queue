@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config({ override: false });
+
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 

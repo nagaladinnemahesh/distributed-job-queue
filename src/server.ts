@@ -1,4 +1,7 @@
-import "dotenv/config";
+// import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config({ override: false });
+
 import Fastify from "fastify";
 import { jobRoutes } from "./routes/job.routes.js";
 import { metricsRoutes } from "./routes/metrics.routes.js";

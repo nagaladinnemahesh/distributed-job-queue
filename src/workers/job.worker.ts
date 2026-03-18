@@ -1,4 +1,7 @@
-import "dotenv/config";
+// import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config({ override: false });
+
 import { Worker } from "bullmq";
 import { redisConnection } from "../config/redis.js";
 import { prisma } from "../db/prisma.js";

@@ -1,4 +1,7 @@
-import "dotenv/config";
+// import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config({ override: false });
+
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
