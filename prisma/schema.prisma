@@ -13,6 +13,7 @@ model Job {
   status      String    @default("PENDING")
   attempts    Int       @default(0)
   maxAttempts Int       @default(3)
+  startedAt DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   completedAt DateTime?

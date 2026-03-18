@@ -64,7 +64,7 @@ Content-Type: application/json
 
 {
   "payload": {
-    "email": "test@example.com"
+    "email": "mahi0518n@example.com"
   }
 }
 
@@ -223,3 +223,10 @@ Content-Type: application/json
   },
   "delay": 300000
 }
+
+
+### Health check
+GET http://localhost:3000/health
+
+### Metrics
+GET http://localhost:3000/metrics

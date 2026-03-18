@@ -3,6 +3,7 @@ import { Worker } from "bullmq";
 import { redisConnection } from "../config/redis.js";
 import { prisma } from "../db/prisma.js";
 import { sendEmail } from "../services/email.service.js";
+import { logger } from "../config/logger.js";
 
 const worker = new Worker(
   "jobs",
@@ -10,28 +11,64 @@ const worker = new Worker(
     const { jobId, type, payload } = job.data;
     const attempts = job.attemptsMade + 1;
     const maxAttempts = 3;
+    const startTime = Date.now();
 
-    console.log(
-      `[worker] picked job ${jobId} (type: ${type}, attempt ${attempts}/${maxAttempts})`,
+    logger.info(
+      {
+        event: "job_started",
+        jobId,
+        type,
+        attempt: attempts,
+        maxAttempts,
+      },
+      "job started",
     );
 
     await prisma.job.update({
       where: { id: jobId },
-      data: { status: "PROCESSING" },
+      data: {
+        status: "PROCESSING",
+        startedAt: new Date(), // correct place
+      },
     });
 
     try {
       await executeJob(type, payload);
 
+      const durationMs = Date.now() - startTime;
+
       await prisma.job.update({
         where: { id: jobId },
-        data: { status: "COMPLETED", completedAt: new Date() },
+        data: {
+          status: "COMPLETED",
+          completedAt: new Date(),
+        },
       });
 
-      console.log(`[worker] completed job ${jobId}`);
+      logger.info(
+        {
+          event: "job_completed",
+          jobId,
+          type,
+          durationMs,
+          attempt: attempts,
+        },
+        "job completed",
+      );
     } catch (error: any) {
-      console.error(
-        `[worker] job ${jobId} failed (attempt ${attempts}/${maxAttempts}) — ${error.message}`,
+      const durationMs = Date.now() - startTime;
+
+      logger.error(
+        {
+          event: "job_failed",
+          jobId,
+          type,
+          attempt: attempts,
+          maxAttempts,
+          durationMs,
+          error: error.message,
+        },
+        "job failed",
       );
 
       await prisma.job.update({
@@ -45,14 +82,18 @@ const worker = new Worker(
       });
 
       if (attempts >= maxAttempts) {
-        console.error(
-          `[worker] job ${jobId} moved to DEAD after ${attempts} attempts — ${error.message}`,
+        logger.warn(
+          {
+            event: "job_dead",
+            jobId,
+            type,
+            attempts,
+            error: error.message,
+          },
+          "job moved to dead letter queue",
         );
       } else {
-        console.log(
-          `[worker] job ${jobId} will retry (attempt ${attempts}/${maxAttempts})`,
-        );
-        throw error; // rethrow so BullMQ knows to retry
+        throw error;
       }
     }
   },
@@ -65,9 +106,7 @@ const worker = new Worker(
 async function executeJob(type: string, payload: any) {
   if (type === "send_email") {
     const { to, subject, body } = payload;
-
     if (!to) throw new Error("Missing required field: to");
-
     await sendEmail(
       to,
       subject ?? "Message from Job Queue",
@@ -77,13 +116,13 @@ async function executeJob(type: string, payload: any) {
   }
 
   if (type === "generate_report") {
-    console.log(`[worker] generating report for: ${JSON.stringify(payload)}`);
+    logger.info({ event: "report_generating", payload }, "generating report");
     await new Promise((r) => setTimeout(r, 1000));
-    console.log(`[worker] report generated`);
+    logger.info({ event: "report_generated", payload }, "report generated");
     return;
   }
 
   throw new Error(`Unknown job type: ${type}`);
 }
 
-console.log("[worker] listening for jobs...");
+logger.info({ event: "worker_started" }, "worker listening for jobs");
