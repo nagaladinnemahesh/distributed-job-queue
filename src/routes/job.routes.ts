@@ -1,6 +1,10 @@
 import { FastifyInstance } from "fastify";
-import { createJob, getJobById } from "../services/job.service.js";
-import { request } from "node:http";
+import {
+  createJob,
+  getJobById,
+  listJobs,
+  retryJob,
+} from "../services/job.service.js";
 
 export async function jobRoutes(fastify: FastifyInstance) {
   fastify.post("/jobs", async (request, reply) => {
@@ -25,11 +29,7 @@ export async function jobRoutes(fastify: FastifyInstance) {
     const { id } = request.params as { id: string };
     const job = await getJobById(id);
 
-    if (!job) {
-      return reply.status(400).send({
-        error: "Job not found",
-      });
-    }
+    if (!job) return reply.status(404).send({ error: "Job not found" });
 
     return {
       jobId: job.id,
@@ -43,4 +43,47 @@ export async function jobRoutes(fastify: FastifyInstance) {
       errorMessage: job.errorMessage ?? null,
     };
   });
+
+  fastify.get("/jobs", async (request, reply) => {
+    const { status, type } = request.query as {
+      status?: string;
+      type?: string;
+    };
+
+    const jobs = await listJobs(status, type);
+
+    return {
+      count: jobs.length,
+      jobs: jobs.map((job) => ({
+        jobId: job.id,
+        type: job.type,
+        status: job.status,
+        attempts: job.attempts,
+        createdAt: job.createdAt,
+        completedAt: job.completedAt,
+        errorMessage: job.errorMessage ?? null,
+      })),
+    };
+  });
+
+  fastify.post(
+    "/jobs/:id/retry",
+    {
+      config: { rawBody: false },
+    },
+    async (request, reply) => {
+      const { id } = request.params as { id: string };
+
+      try {
+        const job = await retryJob(id);
+        return {
+          jobId: job.id,
+          status: job.status,
+          message: "Job re-queued successfully",
+        };
+      } catch (error: any) {
+        return reply.status(400).send({ error: error.message });
+      }
+    },
+  );
 }

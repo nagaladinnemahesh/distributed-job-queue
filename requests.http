@@ -1,58 +1,177 @@
-### Submit a basic email job
+### ============================================================
+### Distributed Job Queue System — API Tests
+### ============================================================
+### Install REST Client extension by Huachao Mao in VS Code
+### Click "Send Request" above any request to test it
+### ============================================================
+
+
+### ============================================================
+### HEALTH
+### ============================================================
+
+### Health check
+GET http://localhost:3000/health
+
+
+### ============================================================
+### SUBMIT JOBS
+### ============================================================
+
+### Submit a real email job
 POST http://localhost:3000/jobs
 Content-Type: application/json
 
 {
   "type": "send_email",
   "payload": {
-    "email": "test@example.com"
+    "to": "mahi0518n@gmail.com",
+    "subject": "Job Queue Test",
+    "body": "This email was processed asynchronously by a background worker using Redis and BullMQ."
   }
 }
 
-### Submit a job that will likely fail (to test retry + DLQ)
-POST http://localhost:3000/jobs
-Content-Type: application/json
+###
 
-{
-  "type": "send_email",
-  "payload": {
-    "email": "fail@example.com"
-  }
-}
-
-### Submit an unknown job type (will always fail + go DEAD)
+### Submit a report job (simulated — completes successfully)
 POST http://localhost:3000/jobs
 Content-Type: application/json
 
 {
   "type": "generate_report",
   "payload": {
-    "reportId": "q4-2026"
+    "reportId": "q4-2026",
+    "format": "pdf"
   }
 }
 
-### Get job status — replace the ID with a real one
-GET http://localhost:3000/jobs/REPLACE_WITH_JOB_ID
+###
 
-### Get a completed job
-GET http://localhost:3000/jobs/3fe15724-e0db-4207-93f1-2b3f8de7a70d
-
-### Get a dead/failed job — should show errorMessage
-GET http://localhost:3000/jobs/13c35f5f-6e25-45cd-873c-7e52ea6d9f1e
-
-### Health check
-GET http://localhost:3000
-
-
-### Send a real email
+### Submit an unknown job type (should return 400 immediately — fail fast)
 POST http://localhost:3000/jobs
 Content-Type: application/json
 
 {
-  "type": "send_email",
+  "type": "unknown_type",
+  "payload": {}
+}
+
+###
+
+### Submit a job with missing type (should return 400)
+POST http://localhost:3000/jobs
+Content-Type: application/json
+
+{
   "payload": {
-    "to": "nagaladinnemahesh@gmail.com",
-    "subject": "Job Queue Test 2",
-    "body": "This email was processed asynchronously by a background worker."
+    "email": "test@example.com"
   }
 }
+
+
+### ============================================================
+### JOB STATUS
+### ============================================================
+
+### Get a single job by ID — replace with a real ID
+GET http://localhost:3000/jobs/REPLACE_WITH_JOB_ID
+
+###
+
+### Get a completed job
+GET http://localhost:3000/jobs/REPLACE_WITH_COMPLETED_ID
+
+###
+
+### Get a dead job — should show errorMessage and failedAt
+GET http://localhost:3000/jobs/REPLACE_WITH_DEAD_ID
+
+
+### ============================================================
+### LIST JOBS
+### ============================================================
+
+### List all jobs (latest 50)
+GET http://localhost:3000/jobs
+
+###
+
+### List only PENDING jobs
+GET http://localhost:3000/jobs?status=PENDING
+
+###
+
+### List only PROCESSING jobs
+GET http://localhost:3000/jobs?status=PROCESSING
+
+###
+
+### List only COMPLETED jobs
+GET http://localhost:3000/jobs?status=COMPLETED
+
+###
+
+### List only DEAD jobs
+GET http://localhost:3000/jobs?status=DEAD
+
+###
+
+### List only email jobs
+GET http://localhost:3000/jobs?type=send_email
+
+###
+
+### List only completed email jobs (combine filters)
+GET http://localhost:3000/jobs?status=COMPLETED&type=send_email
+
+###
+
+### List only dead report jobs
+GET http://localhost:3000/jobs?status=DEAD&type=generate_report
+
+
+### ============================================================
+### RETRY
+### ============================================================
+
+### Retry a dead job — replace with a real DEAD job ID
+POST http://localhost:3000/jobs/89f0dc4c-f678-417e-b89e-94c4f96860d5/retry
+Content-Type: application/json
+
+{}
+
+###
+
+### Try to retry a completed job — should return 400
+### "Job cannot be retried — current status: COMPLETED"
+POST http://localhost:3000/jobs/REPLACE_WITH_COMPLETED_ID/retry
+Content-Type: application/json
+
+{}
+
+
+### ============================================================
+### METRICS
+### ============================================================
+
+### Queue metrics — coming in feature/observability
+GET http://localhost:3000/metrics
+
+
+### ============================================================
+### SCHEDULED JOBS (coming in feature/scheduling)
+### ============================================================
+
+### Submit a job that runs after 30 seconds
+### POST http://localhost:3000/jobs
+### Content-Type: application/json
+###
+### {
+###   "type": "send_email",
+###   "payload": {
+###     "to": "your.email@gmail.com",
+###     "subject": "Scheduled Email",
+###     "body": "This email was scheduled 30 seconds ago."
+###   },
+###   "delay": 30000
+### }
