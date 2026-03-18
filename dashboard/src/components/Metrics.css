@@ -1,0 +1,22 @@
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metric-value {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111;
+}
+
+.metric-label {
+  font-size: 11px;
+  color: #888;
+}

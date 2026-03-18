@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 dotenv.config({ override: false });
 
 import Fastify from "fastify";
+import cors from "@fastify/cors";
 import { jobRoutes } from "./routes/job.routes.js";
 import { metricsRoutes } from "./routes/metrics.routes.js";
 import { healthRoutes } from "./routes/health.routes.js";
@@ -12,6 +13,14 @@ const fastify = Fastify({
   loggerInstance: logger,
 });
 
+fastify.register(cors, {
+  origin: [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+  ],
+});
 fastify.register(jobRoutes);
 fastify.register(metricsRoutes);
 fastify.register(healthRoutes);
