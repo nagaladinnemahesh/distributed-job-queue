@@ -8,17 +8,18 @@ import {
 
 export async function jobRoutes(fastify: FastifyInstance) {
   fastify.post("/jobs", async (request, reply) => {
-    const { type, payload } = request.body as any;
+    const { type, payload, delay } = request.body as any;
 
     if (!type) {
       return reply.status(400).send({ error: "type is required" });
     }
 
     try {
-      const job = await createJob(type, payload);
+      const job = await createJob(type, payload, delay);
       return reply.status(201).send({
         jobId: job.id,
         status: job.status,
+        scheduledFor: job.scheduledFor ?? null,
       });
     } catch (error: any) {
       return reply.status(400).send({ error: error.message });
@@ -38,6 +39,7 @@ export async function jobRoutes(fastify: FastifyInstance) {
       attempts: job.attempts,
       maxAttempts: job.maxAttempts,
       createdAt: job.createdAt,
+      scheduledFor: job.scheduledFor ?? null,
       completedAt: job.completedAt,
       failedAt: job.failedAt,
       errorMessage: job.errorMessage ?? null,

@@ -18,4 +18,5 @@ model Job {
   completedAt DateTime?
   failedAt    DateTime?
   errorMessage String?
+  scheduledFor DateTime?
 }

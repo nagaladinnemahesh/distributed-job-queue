@@ -9,7 +9,8 @@ const VALID_JOB_TYPES = [
   "send_notification",
 ];
 
-export async function createJob(type: string, payload: any) {
+export async function createJob(type: string, payload: any, delay?: number) {
+  const scheduledFor = delay ? new Date(Date.now() + delay) : null;
   if (!VALID_JOB_TYPES.includes(type)) {
     throw new Error(
       `Invalid job type: ${type}. Valid types: ${VALID_JOB_TYPES.join(", ")}`,
@@ -19,14 +20,20 @@ export async function createJob(type: string, payload: any) {
     data: {
       type,
       payload,
+      status: delay ? "SCHEDULED" : "PENDING",
+      scheduledFor,
     },
   });
 
-  await jobQueue.add(type, {
-    jobId: job.id,
+  await jobQueue.add(
     type,
-    payload,
-  });
+    {
+      jobId: job.id,
+      type,
+      payload,
+    },
+    { delay: delay ?? 0 },
+  );
 
   return job;
 }

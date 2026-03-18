@@ -79,7 +79,7 @@ GET http://localhost:3000/jobs/REPLACE_WITH_JOB_ID
 ###
 
 ### Get a completed job
-GET http://localhost:3000/jobs/REPLACE_WITH_COMPLETED_ID
+GET http://localhost:3000/jobs/ce2078d1-8dcd-48fc-a68a-da60a654ed91
 
 ###
 
@@ -175,3 +175,51 @@ GET http://localhost:3000/metrics
 ###   },
 ###   "delay": 30000
 ### }
+
+### ============================================================
+### SCHEDULED JOBS
+### ============================================================
+
+### Submit a job that runs after 30 seconds
+POST http://localhost:3000/jobs
+Content-Type: application/json
+
+{
+  "type": "send_email",
+  "payload": {
+    "to": "mahi0518n@gmail.com",
+    "subject": "Scheduled Email — Job Queue",
+    "body": "This email was scheduled 30 seconds ago and just got processed by a background worker."
+  },
+  "delay": 30000
+}
+
+###
+
+### Submit a job that runs after 1 minute
+POST http://localhost:3000/jobs
+Content-Type: application/json
+
+{
+  "type": "send_email",
+  "payload": {
+    "to": "your.email@gmail.com",
+    "subject": "1 Minute Scheduled Email",
+    "body": "Submitted 1 minute ago, delivered now via the job queue."
+  },
+  "delay": 60000
+}
+
+###
+
+### Submit a job that runs after 5 minutes
+POST http://localhost:3000/jobs
+Content-Type: application/json
+
+{
+  "type": "generate_report",
+  "payload": {
+    "reportId": "scheduled-q4-2026"
+  },
+  "delay": 300000
+}
