@@ -2,6 +2,7 @@ import "dotenv/config";
 import { Worker } from "bullmq";
 import { redisConnection } from "../config/redis.js";
 import { prisma } from "../db/prisma.js";
+import { sendEmail } from "../services/email.service.js";
 
 const worker = new Worker(
   "jobs",
@@ -63,10 +64,25 @@ const worker = new Worker(
 
 async function executeJob(type: string, payload: any) {
   if (type === "send_email") {
-    if (Math.random() < 0.3) throw new Error("SMTP unreachable");
-    console.log(`[worker] sent email to ${JSON.stringify(payload)}`);
+    const { to, subject, body } = payload;
+
+    if (!to) throw new Error("Missing required field: to");
+
+    await sendEmail(
+      to,
+      subject ?? "Message from Job Queue",
+      body ?? "This email was sent asynchronously via the job queue.",
+    );
     return;
   }
+
+  if (type === "generate_report") {
+    console.log(`[worker] generating report for: ${JSON.stringify(payload)}`);
+    await new Promise((r) => setTimeout(r, 1000));
+    console.log(`[worker] report generated`);
+    return;
+  }
+
   throw new Error(`Unknown job type: ${type}`);
 }
 

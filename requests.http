@@ -38,7 +38,21 @@ GET http://localhost:3000/jobs/REPLACE_WITH_JOB_ID
 GET http://localhost:3000/jobs/3fe15724-e0db-4207-93f1-2b3f8de7a70d
 
 ### Get a dead/failed job — should show errorMessage
-GET http://localhost:3000/jobs/7605349b-f846-4222-a041-a83f7550d533
+GET http://localhost:3000/jobs/13c35f5f-6e25-45cd-873c-7e52ea6d9f1e
 
 ### Health check
 GET http://localhost:3000
+
+
+### Send a real email
+POST http://localhost:3000/jobs
+Content-Type: application/json
+
+{
+  "type": "send_email",
+  "payload": {
+    "to": "nagaladinnemahesh@gmail.com",
+    "subject": "Job Queue Test 2",
+    "body": "This email was processed asynchronously by a background worker."
+  }
+}
