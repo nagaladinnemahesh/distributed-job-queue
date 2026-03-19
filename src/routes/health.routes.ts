@@ -15,7 +15,7 @@ export async function healthRoutes(fastify: FastifyInstance) {
 
     // Check PostgreSQL
     try {
-      await prisma.$queryRaw`SELECT 1`;
+      await prisma.$queryRawUnsafe("SELECT 1");
       health.services.database = "healthy";
     } catch {
       health.services.database = "unhealthy";
