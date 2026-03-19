@@ -20,6 +20,10 @@ jobs:
             cd ~/distributed-job-queue
             git pull origin main
             npm install
+            cd dashboard
+            npm install
+            npm run build
+            cd ..
             npx prisma generate
             pm2 restart api --update-env
             pm2 save
