@@ -17,9 +17,10 @@ export async function healthRoutes(fastify: FastifyInstance) {
     try {
       await prisma.$queryRawUnsafe("SELECT 1");
       health.services.database = "healthy";
-    } catch {
+    } catch (err: any) {
       health.services.database = "unhealthy";
       health.status = "unhealthy";
+      console.error("DB health check error:", err.message);
     }
 
     // Check Redis via BullMQ's existing connection
