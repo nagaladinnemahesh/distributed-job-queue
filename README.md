@@ -29,10 +29,10 @@ Client → Fastify API → Redis (BullMQ) → Worker → PostgreSQL
 
 **Infrastructure:**
 
-- EC2 t2.micro — API server + React dashboard (PM2)
-- EC2 t2.micro — BullMQ worker + Redis in Docker (PM2)
+- EC2 t2.small — API server + React dashboard (PM2)
+- EC2 t2.small — BullMQ worker + Redis in Docker (PM2)
 - RDS t2.micro — PostgreSQL (managed)
-- GitHub Actions — auto-deploy on push to main (~21 seconds)
+- GitHub Actions — auto-deploy on push to main (~25 seconds)
 
 ---
 
