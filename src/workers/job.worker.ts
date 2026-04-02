@@ -109,7 +109,7 @@ const worker = new Worker(
 
 function runPythonScript(data: any): Promise<string> {
   return new Promise((resolve, reject) => {
-    const command = `python3 report.py '${JSON.stringify(data)}'`;
+    const command = `venv/bin/python3 report.py '${JSON.stringify(data)}'`;
 
     exec(command, (error, stdout, stderr) => {
       if (error) {
