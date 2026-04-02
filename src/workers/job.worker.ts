@@ -9,6 +9,7 @@ import { sendEmail } from "../services/email.service.js";
 import { logger } from "../config/logger.js";
 import { exec } from "child_process";
 import path from "path";
+import { spawn } from "child_process";
 
 const worker = new Worker(
   "jobs",
@@ -113,14 +114,25 @@ function runPythonScript(data: any): Promise<string> {
     const pythonCmd = "/usr/bin/python3";
     const scriptPath = "/home/ubuntu/distributed-job-queue/report.py";
 
-    const command = `${pythonCmd} ${scriptPath} '${JSON.stringify(data).replace(/'/g, "\\'")}'`;
+    const process = spawn(pythonCmd, [scriptPath, JSON.stringify(data)]);
 
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        console.error("PYTHON ERROR:", stderr);
-        return reject(error);
+    let output = "";
+    let errorOutput = "";
+
+    process.stdout.on("data", (data) => {
+      output += data.toString();
+    });
+
+    process.stderr.on("data", (data) => {
+      errorOutput += data.toString();
+    });
+
+    process.on("close", (code) => {
+      if (code !== 0) {
+        console.error("PYTHON ERROR:", errorOutput);
+        return reject(new Error(errorOutput));
       }
-      resolve(stdout.trim());
+      resolve(output.trim());
     });
   });
 }
