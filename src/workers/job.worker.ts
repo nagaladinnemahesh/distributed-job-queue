@@ -118,7 +118,7 @@ function runPythonScript(data: any): Promise<string> {
       env: {
         ...process.env,
         PYTHONPATH:
-          "/usr/lib/python3/dist-packages:/usr/local/lib/python3.12/dist-packages",
+          "/home/ubuntu/.local/lib/python3.12/site-packages:/usr/local/lib/python3.12/dist-packages:/usr/lib/python3/dist-packages",
       },
     });
 
