@@ -6,7 +6,7 @@ import json
 data = json.loads(sys.argv[1])
 
 if not data:
-    print("No data received")
+    print("[]")
     sys.exit(0)
 
 df = pd.DataFrame(data)
