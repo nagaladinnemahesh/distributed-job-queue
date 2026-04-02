@@ -91,6 +91,16 @@ Run multiple worker instances pointing at the same Redis queue. Each job goes to
 
 ---
 
+## Analytics (Python + pandas)
+
+Submitting a `generate_report` job triggers a Python analytics pipeline:
+
+- Node.js worker queries completed jobs from PostgreSQL
+- Passes data to a Python script via child process
+- pandas aggregates processing time and job counts by type
+- Results saved to database and displayed in dashboard
+- Export as CSV or JSON directly from the UI
+
 ## Tech Stack
 
 | Layer      | Technology              |
