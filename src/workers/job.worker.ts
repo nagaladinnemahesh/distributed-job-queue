@@ -116,8 +116,9 @@ function runPythonScript(data: any): Promise<string> {
 
     const child = spawn(pythonCmd, [scriptPath, JSON.stringify(data)], {
       env: {
-        ...globalThis.process.env,
-        PYTHONPATH: "/usr/lib/python3/dist-packages",
+        ...process.env,
+        PYTHONPATH:
+          "/usr/lib/python3/dist-packages:/usr/local/lib/python3.12/dist-packages",
       },
     });
 
