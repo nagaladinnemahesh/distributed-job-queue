@@ -8,6 +8,7 @@ import { prisma } from "../db/prisma.js";
 import { sendEmail } from "../services/email.service.js";
 import { logger } from "../config/logger.js";
 import { exec } from "child_process";
+import path from "path";
 
 const worker = new Worker(
   "jobs",
@@ -109,11 +110,14 @@ const worker = new Worker(
 
 function runPythonScript(data: any): Promise<string> {
   return new Promise((resolve, reject) => {
-    const command = `venv/bin/python report.py '${JSON.stringify(data)}'`;
+    const pythonCmd = path.resolve(process.cwd(), "venv/bin/python");
+    const scriptPath = path.resolve(process.cwd(), "report.py");
+
+    const command = `${pythonCmd} ${scriptPath} '${JSON.stringify(data).replace(/'/g, "\\'")}'`;
 
     exec(command, (error, stdout, stderr) => {
       if (error) {
-        console.error(stderr);
+        console.error("PYTHON ERROR:", stderr);
         return reject(error);
       }
       resolve(stdout.trim());
