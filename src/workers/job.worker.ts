@@ -111,16 +111,10 @@ const worker = new Worker(
 
 function runPythonScript(data: any): Promise<string> {
   return new Promise((resolve, reject) => {
-    const pythonCmd = "/usr/bin/python3";
+    const pythonCmd = "/home/ubuntu/distributed-job-queue/venv/bin/python";
     const scriptPath = "/home/ubuntu/distributed-job-queue/report.py";
 
-    const child = spawn(pythonCmd, [scriptPath, JSON.stringify(data)], {
-      env: {
-        ...process.env,
-        PYTHONPATH:
-          "/home/ubuntu/.local/lib/python3.12/site-packages:/usr/local/lib/python3.12/dist-packages:/usr/lib/python3/dist-packages",
-      },
-    });
+    const child = spawn(pythonCmd, [scriptPath, JSON.stringify(data)]);
 
     let output = "";
     let errorOutput = "";
