@@ -110,8 +110,8 @@ const worker = new Worker(
 
 function runPythonScript(data: any): Promise<string> {
   return new Promise((resolve, reject) => {
-    const pythonCmd = path.resolve(process.cwd(), "venv/bin/python");
-    const scriptPath = path.resolve(process.cwd(), "report.py");
+    const pythonCmd = "/home/ubuntu/distributed-job-queue/venv/bin/python";
+    const scriptPath = "/home/ubuntu/distributed-job-queue/report.py";
 
     const command = `${pythonCmd} ${scriptPath} '${JSON.stringify(data).replace(/'/g, "\\'")}'`;
 
