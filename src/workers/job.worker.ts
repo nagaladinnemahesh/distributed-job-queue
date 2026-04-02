@@ -114,20 +114,25 @@ function runPythonScript(data: any): Promise<string> {
     const pythonCmd = "/usr/bin/python3";
     const scriptPath = "/home/ubuntu/distributed-job-queue/report.py";
 
-    const process = spawn(pythonCmd, [scriptPath, JSON.stringify(data)]);
+    const child = spawn(pythonCmd, [scriptPath, JSON.stringify(data)], {
+      env: {
+        ...globalThis.process.env,
+        PYTHONPATH: "/usr/lib/python3/dist-packages",
+      },
+    });
 
     let output = "";
     let errorOutput = "";
 
-    process.stdout.on("data", (data) => {
+    child.stdout.on("data", (data) => {
       output += data.toString();
     });
 
-    process.stderr.on("data", (data) => {
+    child.stderr.on("data", (data) => {
       errorOutput += data.toString();
     });
 
-    process.on("close", (code) => {
+    child.on("close", (code) => {
       if (code !== 0) {
         console.error("PYTHON ERROR:", errorOutput);
         return reject(new Error(errorOutput));
