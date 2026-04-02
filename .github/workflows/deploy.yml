@@ -1,12 +1,4 @@
-name: Deploy to AWS
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  deploy-api:
+deploy-api:
     name: Deploy API
     runs-on: ubuntu-latest
     steps:
@@ -20,11 +12,12 @@ jobs:
             cd ~/distributed-job-queue
             git pull origin main
             npm install
+            npx prisma migrate deploy
+            npx prisma generate
             cd dashboard
             npm install
             npm run build
             cd ..
-            npx prisma generate
             pm2 restart api --update-env
             pm2 save
 
@@ -42,6 +35,11 @@ jobs:
             cd ~/distributed-job-queue
             git pull origin main
             npm install
+            npx prisma migrate deploy
             npx prisma generate
+            if [ ! -d "venv" ]; then
+              python3 -m venv venv
+              venv/bin/pip install pandas psycopg2-binary
+            fi
             pm2 restart worker --update-env
             pm2 save
