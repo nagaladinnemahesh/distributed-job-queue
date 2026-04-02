@@ -8,6 +8,7 @@ import fastifyStatic from "@fastify/static";
 import { jobRoutes } from "./routes/job.routes.js";
 import { metricsRoutes } from "./routes/metrics.routes.js";
 import { healthRoutes } from "./routes/health.routes.js";
+import { reportRoutes } from "./routes/report.routes.js";
 import { logger } from "./config/logger.js";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
@@ -31,6 +32,7 @@ fastify.register(fastifyStatic, {
 fastify.register(jobRoutes);
 fastify.register(metricsRoutes);
 fastify.register(healthRoutes);
+fastify.register(reportRoutes);
 
 // fastify.get("/", async () => {
 //   return { message: "Distributed Job Queue Running" };

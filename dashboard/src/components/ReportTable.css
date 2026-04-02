@@ -1,0 +1,50 @@
+.report-table {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.report-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.type {
+  font-weight: 500;
+}
+
+.time {
+  color: #555;
+}
+
+.jobs {
+  color: #888;
+}
+
+.report-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* FIXED BUTTON STYLE */
+.report-actions button {
+  padding: 4px 8px;        
+  font-size: 12px;         
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #ffffff;  
+  color: #333;                
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Hover effect */
+.report-actions button:hover {
+  background-color: #f0f0f0;
+  border-color: #999;
+}

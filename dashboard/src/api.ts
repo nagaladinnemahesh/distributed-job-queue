@@ -31,3 +31,8 @@ export async function getMetrics() {
   const res = await api.get("/metrics");
   return res.data;
 }
+
+export async function getReports() {
+  const res = await api.get("/reports");
+  return res.data;
+}

@@ -21,3 +21,11 @@ model Job {
   errorMessage String?
   scheduledFor DateTime?
 }
+
+model Report {
+  id             String   @id @default(uuid())
+  type           String
+  processingTime String
+  totalJobs      Int
+  createdAt      DateTime @default(now())
+}

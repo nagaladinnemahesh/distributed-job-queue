@@ -44,7 +44,7 @@ export default function JobList({ refresh }: Props) {
 
   useEffect(() => {
     load();
-    const interval = setInterval(load, 3000);
+    const interval = setInterval(load, 5000);
     return () => clearInterval(interval);
   }, [filter, refresh]);
 
@@ -54,7 +54,7 @@ export default function JobList({ refresh }: Props) {
   }
 
   return (
-    <div className="card">
+    <div className="card job-card">
       <div className="list-header">
         <h2>Jobs {loading && <span className="loading-dot" />}</h2>
         <div className="filters">
@@ -72,7 +72,7 @@ export default function JobList({ refresh }: Props) {
 
       {jobs.length === 0 && <p className="empty">No jobs found</p>}
 
-      <div className="job-table">
+      <div className="job-table job-list">
         {jobs.map((job) => (
           <div
             key={job.jobId}

@@ -7,6 +7,7 @@ import { redisConnection } from "../config/redis.js";
 import { prisma } from "../db/prisma.js";
 import { sendEmail } from "../services/email.service.js";
 import { logger } from "../config/logger.js";
+import { exec } from "child_process";
 
 const worker = new Worker(
   "jobs",
@@ -106,6 +107,20 @@ const worker = new Worker(
   },
 );
 
+function runPythonScript(data: any): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const command = `python3 report.py '${JSON.stringify(data)}'`;
+
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        console.error(stderr);
+        return reject(error);
+      }
+      resolve(stdout.trim());
+    });
+  });
+}
+
 async function executeJob(type: string, payload: any) {
   if (type === "send_email") {
     const { to, subject, body } = payload;
@@ -119,9 +134,41 @@ async function executeJob(type: string, payload: any) {
   }
 
   if (type === "generate_report") {
-    logger.info({ event: "report_generating", payload }, "generating report");
-    await new Promise((r) => setTimeout(r, 1000));
-    logger.info({ event: "report_generated", payload }, "report generated");
+    const jobs = await prisma.job.findMany({
+      where: {
+        status: "COMPLETED",
+        startedAt: { not: null },
+        completedAt: { not: null },
+      },
+      select: {
+        id: true,
+        type: true,
+        startedAt: true,
+        completedAt: true,
+      },
+    });
+
+    const output = await runPythonScript(jobs);
+
+    const cleanOutput = output.trim();
+
+    // parse JSON from Python
+    const reportData = JSON.parse(cleanOutput);
+
+    // save to DB
+    await prisma.report.createMany({
+      data: reportData.map((row: any) => ({
+        type: row.type,
+        processingTime: row.processing_time,
+        totalJobs: row.total_jobs,
+      })),
+    });
+
+    logger.info(
+      { event: "report_saved", count: reportData.length },
+      "report saved to database",
+    );
+
     return;
   }
 

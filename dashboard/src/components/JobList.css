@@ -168,3 +168,16 @@
 .btn-retry:hover {
   background: #333;
 }
+
+/* ONLY affect jobs card */
+.job-card {
+  max-height: 500px;   /* adjust if needed */
+  display: flex;
+  flex-direction: column;
+}
+
+/* ONLY scrolling area */
+.job-list {
+  overflow-y: auto;
+  flex: 1;
+}

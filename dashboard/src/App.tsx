@@ -2,6 +2,7 @@ import { useState } from "react";
 import SubmitJob from "./components/SubmitJob";
 import JobList from "./components/JobList";
 import Metrics from "./components/Metrics";
+import ReportTable from "./components/ReportTable";
 import "./App.css";
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
         <div className="left">
           <SubmitJob onSubmitted={onJobSubmitted} />
           <Metrics refresh={refresh} />
+          <ReportTable />
         </div>
         <div className="right">
           <JobList refresh={refresh} />
